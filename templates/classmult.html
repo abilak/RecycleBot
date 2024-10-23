@@ -1,0 +1,375 @@
+{% extends "layout.html" %}
+
+{% block top %}
+<style>
+    body {
+        background-color: #daebe4;
+        margin: 0;
+        padding: 0;
+    }
+    /* General styling for images */
+    img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+        margin: 20px auto;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Soft shadow for depth */
+    }
+
+    /* Modal container styles */
+    .modal {
+        display: none; /* Hidden by default */
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+    }
+
+    .modal-content {
+        background-color: white;
+        padding: 25px;
+        border-radius: 10px;
+        text-align: center;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        transform: translateY(-100px);
+        animation: modal-fade 0.5s ease forwards;
+    }
+
+    h2.lead {
+        color: #1abc9c;
+        font-size: 30px;
+    }
+
+    h2.lead:hover {
+        color: #16a085;
+        font-size: 30px;
+    }
+
+    /* Animation for modal appearance */
+    @keyframes modal-fade {
+        from {
+            opacity: 0;
+            transform: translateY(-100px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Options container style */
+    .options {
+        margin-top: 20px;
+        display: none;
+    }
+
+    /* Close button styling */
+    .close-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        cursor: pointer;
+        font-size: 24px;
+        color: #333;
+        background: none;
+        border: none;
+        padding: 0;
+        transition: color 0.3s;
+    }
+
+    .close-btn:hover {
+        color: red;
+    }
+
+    /* Button Styling */
+    button {
+        padding: 12px 20px;
+        font-size: 1rem;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Yes/No Buttons */
+    .yesButton {
+        background-color: #28a745;
+        color: white;
+    }
+
+    .yesButton:hover {
+        background-color: #218838;
+    }
+
+    .noButton {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .noButton:hover {
+        background-color: #c82333;
+    }
+
+    /* Correct/Incorrect Button */
+    .correctButton {
+        background-color: #27ae60;
+        color: white;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
+    .correctButton:hover {
+        background-color: #2ecc71;
+    }
+
+    .incorrectButton {
+        background-color: #e74c3c;
+        color: white;
+        margin-top: 15px;
+        marginb-ttom: 10px;
+    }
+
+    .incorrectButton:hover {
+        background-color: #c0392b;
+    }
+
+    /* Submit Button */
+    .submitButton {
+        margin-top: 20px;
+        padding: 10px 20px;
+        background-color: #f39c12;
+        color: white;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        display: none;
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .submitButton:hover {
+        background-color: #e67e22;
+        box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .uploadOptions {
+        background-color: #f9e4e1;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        margin-top: 20px;
+        width: 100%; /* Use the full width of the container */
+        max-width: 768px; /* Limit the maximum width to match the image */
+        margin: 0 auto; /* Center the upload options */
+    }
+
+    .uploadOptions h2 {
+        color: #ff6f61;
+        margin-bottom: 20px;
+    }
+
+    .uploadOptions button {
+        background-color: #ff6f61;
+        color: white;
+    }
+
+    .uploadOptions button:hover {
+        background-color: #e64a38;
+    }
+
+    .options {
+        margin-top: 20px;
+        text-align: left;
+    }
+
+    .options input {
+        margin-right: 10px;
+    }
+
+    .options label {
+        font-size: 1rem;
+        color: #34495e;
+    }
+
+    @media (max-width: 768px) {
+        .modal-content {
+            padding: 15px;
+        }
+
+        h2.lead {
+            font-size: 1.25rem;
+        }
+
+        button {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+
+        .options label {
+            font-size: 0.9rem;
+        }
+
+        .uploadOptions {
+            width: auto;
+            margin: 20px auto;
+        }
+    }
+
+    .thinger {
+        color: #007bff;
+    }
+</style>
+
+{% endblock %}
+
+{% block title %}
+    Classify
+{% endblock %}
+
+{% block main %}
+    {% for item in images %}
+        <div>
+            <img src="{{ item["img_data"] }}", width = 768>
+        </div>
+
+        <h2 class = "lead">
+            Classification: {{ item["pred"] }}
+        </h2>
+
+        <div class="uploadOptions">
+            <h2>Do you want to upload this image to the database?</h2>
+            <form class="uploadForm" action="/upload_image" method="POST">
+                <button type="button" class="yesButton">Yes</button>
+                <button type="button" class="noButton">No</button>
+            </form>
+        </div>
+
+        <!-- Modal for Image Verification -->
+        <div class="modal">
+            <div class="modal-content">
+                <button class = 'close-btn'>&times;</button>
+                <h3>Was the classification of the image correct?</h3>
+                <button class="correctButton">Correct</button>
+                <button class="incorrectButton">Incorrect</button>
+
+                <!-- If incorrect, show these options -->
+                <div class="options" style="display:none;">
+                    <h4 class = "thinger">Select the correct label:</h4>
+                    <input type="radio" class="recycle" name="label" value="recycle">
+                    <label for="recycle">Recycle</label><br>
+                    <input type="radio" class="trash" name="label" value="trash">
+                    <label for="trash">Trash</label><br>
+                    <input type="radio" class="compost" name="label" value="compost">
+                    <label for="compost">Compost</label><br>
+                </div>
+
+                <button class="submitButton" style="display:none;">Submit</button>
+            </div>
+        </div>
+    {% endfor %}
+
+    <script>
+        // ADD THAT THE PERSON WHEN THEY CLICK INCORRECT CAN CLICK ON IT AND THEN IT WILL HIDE IT.
+        const yesButton = document.getElementsByClassName('yesButton');
+        const noButton = document.getElementsByClassName('noButton');
+        const modal = document.getElementsByClassName('modal');
+        const correctButton = document.getElementsByClassName('correctButton');
+        const incorrectButton = document.getElementsByClassName('incorrectButton');
+        const labelOptions = document.getElementsByClassName('options');
+        const submitButton = document.getElementsByClassName('submitButton');
+        const uploadOptions = document.getElementsByClassName('uploadOptions');
+        const closeButton = document.getElementsByClassName('close-btn');
+
+        // When the user clicks "Yes" to upload, show the modal and hide the options
+        for(let i = 0; i < yesButton.length; i++) {
+            yesButton[i].addEventListener('click', function () {
+                modal[i].style.display = 'flex';  // Show the modal
+                closeButton[i].style.display = 'flex';
+            });
+        }
+        for(let i = 0; i < closeButton.length; i++) {
+            closeButton[i].addEventListener('click', function () {
+                modal[i].style.display = 'none';
+                closeButton[i].style.display = 'none';
+            });
+        }
+
+        // When the user clicks "Correct", submit the image directly
+        for(let i = 0; i < correctButton.length; i++) {
+            correctButton[i].addEventListener('click', function () {
+                const formData = new FormData();
+                formData.append('correct', true);
+
+                fetch('/upload_image', {
+                    method: 'POST',
+                    body: formData  // Send image correctness to Flask
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert('Image uploaded successfully!');
+                    modal[i].style.display = 'none';  // Hide the modal after upload
+                })
+                .catch(error => console.error('Error:', error));
+                uploadOptions[i].style.display = 'none';
+            });
+        }
+
+        // If "Incorrect" is clicked, show label options
+        for(let i = 0; i < incorrectButton.length; i++) {
+            incorrectButton[i].addEventListener('click', function () {
+                if(labelOptions[i].style.display != 'block') {
+                    labelOptions[i].style.display = 'block';
+                    submitButton[i].style.display = 'inline-block';
+                }
+
+                else {
+                    labelOptions[i].style.display = 'none';
+                    submitButton[i].style.display = 'none';
+                }
+
+            });
+        }
+
+        // When "Submit" is clicked after selecting a label
+        for(let i = 0; i < incorrectButton.length; i++) {
+            submitButton[i].addEventListener('click', function () {
+                const selectedLabel = document.querySelector('input[name="label"]:checked').value;
+                uploadOptions[i].style.display = 'none';
+                const formData = new FormData();
+                formData.append('correct', false);
+                formData.append('label', selectedLabel);
+
+                fetch('/upload_image', {
+                    method: 'POST',
+                    body: formData  // Send image label to Flask
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert('Image with correct label uploaded successfully!');
+                    modal[i].style.display = 'none';  // Hide the modal after submission
+                })
+                .catch(error => console.error('Error:', error));
+                uploadOptions[i].style.display = 'none';
+            });
+        }
+
+        // Close modal on "No" and hide the upload options
+        for(let i = 0; i < noButton.length; i++) {
+            noButton[i].addEventListener('click', function () {
+                alert('No image uploaded');
+                uploadOptions[i].style.display = 'none';  // Hide the Yes/No buttons
+            });
+        }
+    </script>
+
+{% endblock %}

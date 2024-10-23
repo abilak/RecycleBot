@@ -1,0 +1,380 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    More Ways to Support The Environment
+{% endblock %}
+
+{% block top %}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+        body {
+            background-color: #daebe4;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 24px;
+            margin: 30px 0;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+            padding: 0 15px;
+        }
+
+        .controls label {
+            font-size: 16px;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .controls select, .controls input {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 10px;
+        }
+
+        .controls button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+            max-width: 200px;
+        }
+
+        .controls button:hover {
+            background-color: #1f8241;
+        }
+
+        #map {
+            height: 600px;
+            width: 100%;
+            margin: 0 auto;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+            margin-bottom: 20px;
+        }
+
+        .marker-icon-red {
+            background-color: red;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            border: 3px solid white;
+        }
+
+        .marker-icon-green {
+            background-color: green;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            border: 3px solid white;
+        }
+
+        .marker-icon-blue {
+            background-color: blue;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            border: 2px solid white;
+        }
+
+        .autocomplete {
+            width: 100%;
+            max-width: 400px;
+            margin: 20px auto;
+        }
+
+        @media (min-width: 768px) {
+            .controls {
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .controls input,
+            .controls select {
+                flex: 1;
+                max-width: 400px;
+            }
+
+            .controls button {
+                flex-shrink: 0;
+                margin-top: 10px;
+                max-width: 400px;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .controls {
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .controls input,
+            .controls select {
+                max-width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .controls button {
+                margin-top: 10px;
+                width: 100%;
+            }
+        }
+
+        .controls#search-location {
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            padding: 0 15px;
+        }
+
+        .controls#search-location label {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .controls#search-location input {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .controls#search-location button {
+            background-color: #3498db;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            max-width: 200px;
+        }
+
+        .controls#search-location button:hover {
+            background-color: #2980b9;
+        }
+    </style>
+{% endblock %}
+
+{% block main %}
+    <h1>Find Recycling Centers and Food Charities Near You</h1>
+    <div class="controls">
+        <label for="radiusSelect">Select Radius: </label>
+        <select id="radiusSelect">
+            <option value="5000">5 km</option>
+            <option value="10000">10 km</option>
+            <option value="20000">20 km</option>
+            <option value="30000">30 km</option>
+        </select>
+    </div>
+
+
+    <div class="controls">
+        <label for="locationInput">Enter a Location: </label>
+        <input type="text" id="locationInput" placeholder="Type a location">
+        <button id="searchButton">Search</button>
+    </div>
+
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+    <script>
+        var map = L.map('map').setView([51.505, -0.09], 13);  // Default view
+        var currentUserLocation = [51.505, -0.09];  // Default current location
+        var userMarker = null;  // Track the user's location marker
+
+        // Add OpenStreetMap tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        var radiusSelect = document.getElementById('radiusSelect');
+        let placeMarkers = [];
+
+        // Function to fetch recycling centers and food charities based on selected radius
+        function fetchPlaces(lat, lon, radius) {
+            var overpassUrl = "https://overpass-api.de/api/interpreter";
+            var overpassQuery = `
+                [out:json];
+                (
+                node["amenity"="recycling"](around:${radius},${lat},${lon});
+                node["amenity"="charity"](around:${radius},${lat},${lon});
+                node["social_facility"="food_bank"](around:${radius},${lat},${lon});
+                );
+                out body;
+            `;
+
+            fetch(overpassUrl, {
+                method: 'POST',
+                body: overpassQuery
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Remove previous markers
+                placeMarkers.forEach(marker => map.removeLayer(marker));  // Remove old markers from the map
+                placeMarkers = [];  // Clear the markers array
+
+                // Add new markers
+                data.elements.forEach(function(element) {
+                    if (element.lat && element.lon) {
+                        let markerIcon;
+                        let popupText;
+
+                        // Differentiate recycling centers and food charities
+                        if (element.tags.amenity === 'recycling') {
+                            markerIcon = L.divIcon({
+                                className: 'marker-icon-green',
+                                iconSize: [30, 30]
+                            });
+                            popupText = element.tags.name ? element.tags.name : 'Recycling Center';
+                        } else {
+                            markerIcon = L.divIcon({
+                                className: 'marker-icon-red',
+                                iconSize: [30, 30]
+                            });
+                            popupText = element.tags.name ? element.tags.name : 'Food Charity';
+                        }
+
+                        // Create marker and add it to the map
+                        let marker = L.marker([element.lat, element.lon], { icon: markerIcon })
+                            .addTo(map)
+                            .bindPopup(`
+                            ${popupText} <br>
+                            <a href="https://www.google.com/search?q=${encodeURIComponent(element.lat + ',' + element.lon)}" target="_blank">
+                                Search this address on Google
+                            </a>
+                        `);
+
+                        // Store the marker in the array
+                        placeMarkers.push(marker);
+                    }
+                });
+            })
+            .catch(error => {
+                console.error("Error fetching data:", error);
+            });
+        }
+
+        // Function to set the new user location (when map is clicked or geolocation is available)
+        function setUserLocation(lat, lon) {
+            currentUserLocation = [lat, lon];  // Update the current location
+
+            // Center map to the new location
+            map.setView([lat, lon], 13);
+
+            // If the previous userMarker exists, remove it
+            if (userMarker) {
+                map.removeLayer(userMarker);
+            }
+
+            // Add a new user location marker
+            userMarker = L.marker([lat, lon], {
+                icon: L.divIcon({
+                    className: 'marker-icon-blue',
+                    iconSize: [30, 30]
+                })
+            }).addTo(map)
+            .bindPopup("This is your current location");
+
+            // Fetch places based on the new user location
+            fetchPlaces(lat, lon, radiusSelect.options[radiusSelect.selectedIndex].value);
+        }
+
+        // Use geolocation to center map and fetch places
+        function fetchUserLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var userLat = position.coords.latitude;
+                    var userLon = position.coords.longitude;
+
+                    setUserLocation(userLat, userLon);  // Set the user's location
+                }, function() {
+                    alert("Location access denied. Showing default location.");
+                    setUserLocation(51.505, -0.09);  // Default to London
+                });
+            } else {
+                alert("Geolocation is not supported by this browser.");
+                setUserLocation(51.505, -0.09);  // Default to London
+            }
+        }
+
+        // Fetch places when page loads
+        window.onload = function () {
+            fetchUserLocation();
+        };
+
+        // Fetch new data when user changes radius
+        radiusSelect.addEventListener('change', function() {
+            setUserLocation(currentUserLocation[0], currentUserLocation[1]);
+        });
+
+        // Update user location when map is clicked
+        map.on('click', function(event) {
+            var clickedLat = event.latlng.lat;
+            var clickedLon = event.latlng.lng;
+
+            setUserLocation(clickedLat, clickedLon);  // Update user location on click
+        });
+
+        function searchLocation() {
+            var locationInput = document.getElementById('locationInput').value;
+
+            if (!locationInput) {
+                alert("Please enter a location!");
+                return;
+            }
+
+            var searchUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(locationInput)}`;
+
+            fetch(searchUrl)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.length > 0) {
+                        var lat = data[0].lat;
+                        var lon = data[0].lon;
+                        currentUserLocation[0] = lat;
+                        currentUserLocation[1] = lon;
+
+                        // Set the user location to the searched location
+                        setUserLocation(lat, lon);
+                    } else {
+                        alert("Location not found. Please try again.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error searching location:", error);
+                    alert("An error occurred while searching for the location.");
+                });
+        }
+
+        // Add event listener to the search button
+        document.getElementById('searchButton').addEventListener('click', searchLocation);
+    </script>
+{% endblock %}

@@ -1,0 +1,241 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Multiple Pictures
+{% endblock %}
+
+{% block top %}
+<style>
+    body {
+        background-image: url('{{ url_for("static", filename="uploads/azorestoned.jpg") }}');
+        background-size: cover; /* Ensures the image covers the whole page */
+        background-position: center; /* Centers the image */
+        background-repeat: no-repeat; /* Prevents the image from repeating */
+        background-attachment: fixed; /* Keeps the image fixed while scrolling */
+        color: #495057; /* Text color */
+        margin: 0;
+        padding: 0;
+        height: 100vh; /* Full height */
+    }
+    /* Make the video responsive */
+    video, canvas {
+        max-width: 100%;
+        height: auto;
+        display: block;
+        margin: 0 auto;
+        border-radius: 10px; /* Rounded corners */
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Soft shadow for depth */
+    }
+
+    /* Center the video and image on the screen */
+
+    /* Button styling */
+    button {
+        padding: 10px 20px;
+        font-size: 16px;
+        margin-top: 20px;
+    }
+
+    /* Add some responsive styling for mobile */
+    @media (max-width: 768px) {
+        video, canvas {
+            width: 90%; /* Reduce the width on smaller screens */
+        }
+
+        button {
+            width: 80%;
+            font-size: 18px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        video, canvas {
+            width: 100%; /* Full width on very small screens */
+        }
+
+        button {
+            padding: 14px 30px;
+        }
+    }
+
+    .numofels {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 20px;
+    }
+
+    /* Added style for the number of pics taken */
+    #number {
+        text-align: center;
+        font-size: 1.7rem;
+        margin-top: 20px;
+        color: white;
+    }
+
+    #submitter {
+        background-color: #ff8585; /* A pleasant blue color */
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-top: 20px; /* Space between button and dropdown */
+    }
+
+    #submitter:hover {
+        background-color: #f57676; /* Darker blue on hover */
+        transform: scale(1.05); /* Slight zoom effect */
+    }
+
+    /* Styling for the elements inside the numofels div */
+    .numofels label {
+        font-size: 18px;
+        margin-bottom: 10px;
+        color: #34495e; /* A darker muted blue */
+        font-weight: bold;
+    }
+
+    .numofels select {
+        width: 200px;
+        padding: 10px;
+        font-size: 16px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        margin-top: 10px;
+        transition: border-color 0.3s ease;
+    }
+
+    .numofels select:focus {
+        border-color: #3498db; /* Blue border when focused */
+    }
+
+    #displayImage {
+        max-width: 100%;
+        height: auto;
+        display: block;
+        border: none;
+        margin: 20px auto; /* Center the image */
+        border-radius: 10px; /* Rounded corners */
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Add depth with shadow */
+        transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+        background-color: #1abc9c;
+        color: white;
+    }
+
+    #displayImage:hover {
+        border: none;
+        transform: scale(1.05); /* Slight zoom effect on hover */
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Enhanced shadow on hover */
+        background-color: #16a085;
+    }
+
+    .numofels > label {
+        font-size: 40px;
+        color: #85efff;
+    }
+</style>
+{% endblock %}
+
+{% block main %}
+<div class = "numofels">
+    <label for="num">How many pictures:</label>
+
+    <select id="num">
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+    <option value="4" selected>4</option>
+    <option value="5" selected>5</option>
+    </select>
+</div>
+<button id = "submitter">Submit!</button>
+
+<div class = "page" style = "display: none;">
+    <video id="video" width="640" height="480" autoplay playsinline ></video>
+    <canvas id="canvas" width="640" height="480" style="display: none;"></canvas>
+
+    <br>
+    <button id="displayImage">Capture Image</button>
+</div>
+
+<p style = "display: none;" id = "number">Number of pics taken: 0</p>
+
+<script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const context = canvas.getContext('2d');
+    const displayButton = document.getElementById('displayImage');
+    const submit1 = document.getElementById('submitter');
+    const div1 = document.getElementsByClassName('numofels')[0];
+    const div2 = document.getElementsByClassName('page')[0];
+    const nums = document.getElementById('number');
+    let num_of_pics = -1;
+    let image_data = [];
+    submit1.addEventListener('click', function() {
+        num_of_pics = parseInt(document.getElementById("num").value);
+        div1.style.display = 'none';
+        div2.style.display = 'block';
+        submit1.style.display = 'none';
+        nums.style.display = 'block';
+        let curr_pics = 0;
+        displayButton.addEventListener('click', function () {
+            // Draw the current frame from the video onto the canvas
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            curr_pics++;
+            // Convert the canvas content into a Base64 image data URL
+            const imageData = canvas.toDataURL('image/png');
+
+            image_data.push(imageData);
+            let sentence = "Number of pics taken: ";
+            nums.innerHTML = sentence.concat((curr_pics).toString());
+            console.log(image_data);
+            console.log(curr_pics);
+            if(curr_pics == num_of_pics) {
+                fetch('/picmult', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ imagr: image_data })  // Send image data to Flask
+                })
+                .then(response => {
+                    if (response.redirected) {
+                        // If the server responds with a redirect, follow it to display the image
+                        window.location.href = response.url;
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+            }
+        });
+    });
+
+    // Access the camera with proper constraints for mobile devices
+    const constraints = {
+        video: {
+            facingMode: 'environment'  // Use 'user' for front camera, 'environment' for rear camera
+        }
+    };
+
+    function startCamera() {
+        navigator.mediaDevices.getUserMedia(constraints)
+            .then(function (stream) {
+                video.srcObject = stream;
+            })
+            .catch(function (err) {
+                console.log('Error accessing the camera: ' + err);
+            });
+    }
+
+    // Start the camera once the page is loaded (for desktop) or on button click (for mobile)
+    window.onload = function () {
+        startCamera();
+    };
+
+</script>
+{% endblock %}

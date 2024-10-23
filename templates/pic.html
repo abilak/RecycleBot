@@ -1,0 +1,155 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Pic
+{% endblock %}
+
+{% block top %}
+<style>
+    body {
+        background-image: url('{{ url_for("static", filename="uploads/azores.webp") }}');
+        background-size: cover; /* Ensures the image covers the whole page */
+        background-position: center; /* Centers the image */
+        background-repeat: no-repeat; /* Prevents the image from repeating */
+        background-attachment: fixed; /* Keeps the image fixed while scrolling */
+        color: #495057; /* Text color */
+        margin: 0;
+        padding: 0;
+        height: 100vh; /* Full height */
+    }
+
+    /* General styling for video and canvas */
+    video, canvas {
+        max-width: 100%;
+        height: auto;
+        display: block;
+        margin: 0 auto;
+        border-radius: 10px; /* Rounded corners */
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Soft shadow for depth */
+    }
+
+    /* Centering the video and button on the screen */
+    .container {
+        max-width: 800px;
+        margin: 40px auto;
+        text-align: center;
+    }
+
+    /* Button styling */
+    button {
+        padding: 12px 25px;
+        font-size: 18px;
+        margin-top: 20px;
+        background-color: #ff8585;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Button shadow */
+    }
+
+    button:hover {
+        background-color: #f57676;
+        transform: translateY(-2px);
+    }
+
+    button:active {
+        transform: translateY(1px);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15); /* Smaller shadow on click */
+    }
+
+    /* Responsive design for mobile */
+    @media (max-width: 768px) {
+        video, canvas {
+            width: 90%; /* Reduce the width on smaller screens */
+        }
+
+        button {
+            width: 90%;
+            font-size: 20px;
+            padding: 15px;
+        }
+    }
+
+    /* Additional styling for clean mobile views */
+    @media (max-width: 480px) {
+        video, canvas {
+            width: 100%; /* Full width on very small screens */
+        }
+
+        button {
+            padding: 14px 30px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block main %}
+
+<video id="video" width="640" height="480" autoplay playsinline></video>
+<canvas id="canvas" width="640" height="480" style="display: none;"></canvas>
+
+<br>
+<button id="displayImage">Capture & Classify Image</button>
+
+<script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const context = canvas.getContext('2d');
+    const displayButton = document.getElementById('displayImage');
+
+    // Access the camera with proper constraints for mobile devices
+    const constraints = {
+        video: {
+            facingMode: 'environment'  // Use 'user' for front camera, 'environment' for rear camera
+        }
+    };
+
+    function startCamera() {
+        navigator.mediaDevices.getUserMedia(constraints)
+            .then(function (stream) {
+                video.srcObject = stream;
+            })
+            .catch(function (err) {
+                console.log('Error accessing the camera: ' + err);
+            });
+    }
+
+    // Capture the video frame and send the image to the Flask server
+    displayButton.addEventListener('click', function () {
+        // Draw the current frame from the video onto the canvas
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        // Convert the canvas content into a Base64 image data URL
+        const imageData = canvas.toDataURL('image/png');
+
+        // Log for debugging purposes
+        console.log("Captured Image Data:", imageData);
+
+        // Send the image data to the Flask server via POST request
+        fetch('/pic', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ image: imageData })  // Send image data to Flask
+        })
+        .then(response => {
+            if (response.redirected) {
+                // If the server responds with a redirect, follow it to display the image
+                window.location.href = response.url;
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+    });
+
+    // Start the camera once the page is loaded (for desktop) or on button click (for mobile)
+    window.onload = function () {
+        startCamera();
+    };
+
+</script>
+{% endblock %}

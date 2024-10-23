@@ -1,0 +1,242 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    About
+{% endblock %}
+
+{% block top %}
+    <style>
+        body {
+            background-image: url('{{ url_for("static", filename="uploads/waterfall.jpg") }}');
+            background-size: cover; /* Ensures the image covers the whole page */
+            background-position: center; /* Centers the image */
+            background-repeat: no-repeat; /* Prevents the image from repeating */
+            background-attachment: fixed; /* Keeps the image fixed while scrolling */
+            color: #495057; /* Text color */
+            margin: 0;
+            padding: 0;
+            height: 100vh; /* Full height */
+        }
+
+        .container {
+            margin-top: 50px;
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .lead {
+            font-size: 1.2rem;
+            color: #333;
+        }
+
+        /* Box Styling */
+        .section-box {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.85), rgba(240, 240, 240, 0.8));
+            padding: 30px;
+            margin-top: 20px;
+            border-radius: 10px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s ease-in-out;
+        }
+
+        .section-box:hover {
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        h3 {
+            font-size: 2rem;
+            color: #28a745;
+            margin-bottom: 15px;
+        }
+
+        .about-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            margin-top: 30px;
+        }
+
+        /* Paragraph Box */
+        .paragraph-box {
+            background: white;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s ease-in-out;
+        }
+
+        .paragraph-box:hover {
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Eco Section */
+        .eco-section {
+            background: #d4edda;
+            padding: 25px;
+            border-radius: 10px;
+            margin-top: 40px;
+            border-left: 5px solid #28a745;
+        }
+
+        .eco-section h3 {
+            font-size: 2rem;
+            color: #28a745;
+            margin-bottom: 15px;
+        }
+
+        .eco-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .eco-section ul li {
+            padding: 10px 0;
+            font-size: 1.1rem;
+            border-bottom: 1px solid #28a745;
+        }
+
+        .eco-section ul li:last-child {
+            border-bottom: none;
+        }
+
+        .eco-section ul li:before {
+            content: "🌍";
+            margin-right: 10px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background-color: #007bff;
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-size: 1.2rem;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .cta-button:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+
+        .cta-button:active {
+            transform: scale(1);
+        }
+
+        /* Custom Bullets for How to Use */
+        .how-to-use ul {
+            list-style: none;
+            padding-left: 20px;
+        }
+
+        .how-to-use ul li {
+            padding: 10px 0;
+            font-size: 1.1rem;
+            position: relative;
+        }
+
+        .how-to-use ul li:before {
+            content: "✔️";
+            position: absolute;
+            left: 0;
+            top: 0;
+            font-size: 1.5rem;
+            margin-top: 2px;
+        }
+
+        .how-to-use ul li span {
+            padding-left: 30px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                margin-top: 20px;
+            }
+
+            .about-image {
+                max-width: 100%;
+                height: auto;
+            }
+        }
+
+        .about-image {
+            max-width: 200px; /* Adjust size as needed */
+            height: 200px; /* Make it a square to be circular */
+            border-radius: 50%; /* Circular frame */
+            object-fit: cover; /* Ensures the image fits well within the circle */
+            border: 5px solid #007bff; /* Optional: adds a border around the image */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Adds a subtle shadow */
+            margin-top: 30px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Responsive adjustments for the image */
+        @media (max-width: 768px) {
+            .about-image {
+                max-width: 150px; /* Adjust for mobile */
+                height: 150px;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block main %}
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 offset-lg-2">
+
+                <!-- About Us Section Box -->
+                <div class="section-box">
+                    <h2>Mission</h2>
+                    <p class="lead">
+                        RecycleBot is here to help you make eco-friendly choices. A major issue is knowing which items go in which bins. Many recyclable items end up in the trash, or worse, trash goes in the recycling bin. This harms the environment and creates extra work for recycling centers.
+                    </p>
+                    <img src="../static/uploads/recart.avif" class="about-image img-fluid" alt="Recycling Image">
+                </div>
+
+                <!-- How to Use Section Box -->
+                <div class="section-box">
+                    <h2>How to Use</h2>
+
+                    <div class="how-to-use">
+                        <ul>
+                            <li><span>Take a picture in the "Classify" section to get an instant classification of your item (recyclable, compostable, or trash).</span></li>
+                            <li><span>Upload images to help us improve our model and increase its accuracy over time.</span></li>
+                            <li><span>Take or upload multiple pictures, and get classifications for each one.</span></li>
+                            <li><span>Contribute to the research by submitting images to improve our model and help us make better predictions.</span></li>
+                            <li><span>Explore the "Eco-Friendly Businesses" section to discover sustainable companies you can support.</span></li>
+                            <li><span>Find Recycling Centers & Food Charities near you to be more aware of environmentally-friendly services near you.</span></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Eco-Friendly Businesses Section Box -->
+                <div class="eco-section">
+                    <h3>Support Eco-Friendly Businesses</h3>
+                    <ul>
+                        <li>Find businesses that focus on sustainable practices.</li>
+                        <li>Support companies that minimize waste and use recyclable materials.</li>
+                        <li>Help reduce carbon footprints by making informed choices.</li>
+                    </ul>
+                    <a href="/showcase" class="cta-button">Learn More</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

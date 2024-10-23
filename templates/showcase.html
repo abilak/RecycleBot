@@ -1,0 +1,152 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Showcase
+{% endblock %}
+
+{% block top %}
+<style>
+body {
+    background-color: #f4f8f3;
+    margin: 0;
+    padding: 0;
+}
+header {
+    background-color: #4CAF50;
+    color: white;
+    padding: 30px 20px;
+    text-align: center;
+}
+.company-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 40px;
+    padding: 20px;
+    justify-content: center;
+}
+.company {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    padding: 30px;
+    transition: transform 0.3s ease;
+}
+.company img {
+    width: 150px;
+    height: 150px;
+    object-fit: contain;
+    margin-bottom: 20px;
+}
+.company h3 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 15px;
+}
+.company p {
+    font-size: 16px;
+    color: #666;
+    line-height: 1.6;
+}
+.company:hover {
+    transform: scale(1.05);
+}
+footer {
+    text-align: center;
+    background-color: #4CAF50;
+    color: white;
+    padding: 15px;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .company-list {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 20px;
+    }
+    .company {
+        max-width: 300px;
+        padding: 20px;
+    }
+    .company img {
+        width: 120px;
+        height: 120px;
+    }
+}
+
+@media (max-width: 480px) {
+    .company {
+        max-width: 100%;
+        padding: 15px;
+    }
+    .company img {
+        width: 100px;
+        height: 100px;
+    }
+    footer {
+        padding: 10px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block main %}
+<header>
+    <h1>Discover Unique Eco-Friendly Companies</h1>
+    <p>Explore these innovative brands making a difference in the world!</p>
+</header>
+
+<section class="company-list">
+
+    <div class="company">
+        <img src="../static/uploads/allbirds.png" alt="Allbirds Logo">
+        <h3>Allbirds</h3>
+        <p>Allbirds creates sustainable shoes using materials like wool, eucalyptus, and sugarcane. They aim to reduce their carbon footprint and have pioneered eco-conscious footwear design.</p>
+    </div>
+
+    <div class="company">
+        <img src="../static/uploads/MiiR.png" alt="MiiR Logo">
+        <h3>MiiR</h3>
+        <p>MiiR creates sustainable drinkware and bags. Each product sold supports giving projects around the world related to clean water, healthy environments, and community-building.</p>
+    </div>
+
+    <div class="company">
+        <img src="../static/uploads/eirnyc.png" alt="Eir NYC Logo">
+        <h3>Eir NYC</h3>
+        <p>Eir NYC offers all-natural skincare products using organic ingredients with minimal packaging. Their mission is to create effective, sustainable skincare products with a focus on environmental stewardship.</p>
+    </div>
+
+    <div class="company">
+        <img src="../static/uploads/trashie.png" alt="Trashie Logo">
+        <h3>Trashie</h3>
+        <p>Trashie designs fashionable accessories made entirely from upcycled waste materials. Their mission is to reduce landfill waste while promoting creativity through innovative, sustainable fashion.</p>
+    </div>
+
+    <div class="company">
+        <img src="../static/uploads/ecoalf.jpg" alt="ECOALF Logo">
+        <h3>ECOALF</h3>
+        <p>ECOALF creates sustainable clothing and accessories from recycled materials, such as plastic bottles and discarded fishing nets. Their mission is to demonstrate that fashion can be both stylish and sustainable.</p>
+    </div>
+
+    <div class="company">
+        <img src="../static/uploads/bureo.png" alt="Bureo Logo">
+        <h3>Bureo</h3>
+        <p>Bureo transforms discarded fishing nets into skateboards, sunglasses, and other products. By repurposing waste, they help reduce ocean plastic pollution and support sustainable design.</p>
+    </div>
+
+    <div class="company">
+        <img src="../static/uploads/pela.webp" alt="Pela Logo">
+        <h3>Pela</h3>
+        <p>Pela creates compostable phone cases, reducing the environmental impact of phone accessories. Their products are designed to break down without leaving harmful waste behind.</p>
+    </div>
+
+    <div class="company">
+        <img src="../static/uploads/drbronners.png" alt="Pela Logo">
+        <h3>Dr. Bronner's</h3>
+        <p>Dr. Bronner’s creates eco-friendly personal care products using organic, fair-trade ingredients and sustainable practices. Their products are cruelty-free, packaged in recycled materials, and support regenerative agriculture to minimize environmental impact.</p>
+    </div>
+
+</section>
+{% endblock %}
