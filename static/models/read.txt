@@ -1,0 +1,3 @@
+The models that I created for my machine learning task are too big to upload to GitHub, so a google drive link is provided to download the model. To run the web application, you would download this code and the model, and drag the model into this folder.
+
+GDrive Link: https://drive.google.com/file/d/1tFnCR5d0-S-qvYcJ06RZ-9FoHH76njHv/view?usp=sharing .
