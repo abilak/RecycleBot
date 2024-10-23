@@ -1,0 +1,161 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Upload Pictures
+{% endblock %}
+
+{% block top %}
+<style>
+    /* General layout styling */
+    body {
+        background-image: url('{{ url_for("static", filename="uploads/azores.webp") }}');
+        background-size: cover; /* Ensures the image covers the whole page */
+        background-position: center; /* Centers the image */
+        background-repeat: no-repeat; /* Prevents the image from repeating */
+        background-attachment: fixed; /* Keeps the image fixed while scrolling */
+        color: #495057; /* Text color */
+        height: 100vh; /* Full height */
+    }
+
+    /* Styling for the instruction text */
+    #instruction {
+        font-size: 18px;
+        color: #34495e; /* Muted blue-grey */
+        margin-bottom: 10px;
+        font-weight: 500;
+        text-align: center;
+    }
+
+    /* Styling for the file input */
+    #imageInput {
+        padding: 10px 20px;
+        background-color: #2ecc71; /* Light green */
+        color: white;
+        border-radius: 5px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Slight shadow for depth */
+        width: 100%;
+        max-width: 300px;
+        text-align: center;
+    }
+
+    #imageInput:hover {
+        background-color: #27ae60; /* Darker green on hover */
+        transform: scale(1.05); /* Slight zoom effect */
+    }
+
+    #imageInput::before {
+        display: inline-block;
+        background-color: #2ecc71; /* Light green */
+        color: white;
+        border: 1px solid #3498db;
+        border-radius: 5px;
+        padding: 10px 20px;
+        outline: none;
+        white-space: nowrap;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 16px;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    /* Styling for the upload button */
+    #uploadBtn {
+        display: block;
+        margin: 10px auto;
+        padding: 12px 20px;
+        background-color: #ff8585; /* Blue button */
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Slight shadow for depth */
+        width: 100%;
+        max-width: 200px;
+    }
+
+    #uploadBtn:hover {
+        background-color: #f57676;
+        transform: scale(1.05); /* Slight zoom effect */
+    }
+
+    /* Centering content */
+    .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        margin-top: 50px;
+    }
+
+    .lead {
+        margin-top: -50%;
+        font-size: 40px;
+        color: #85efff;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}
+
+{% block main %}
+    <p class = "lead">Please only upload at maximum five pictures!</p>
+    <input type="file" id="imageInput" name="images" accept="image/png, image/jpeg" multiple>
+    <br><br>
+    <button id="uploadBtn">Upload</button>
+
+    <script>
+        document.getElementById('uploadBtn').onclick = async function() {
+            let files = document.getElementById('imageInput').files;
+
+            // Check if more than 5 files are selected
+            if (files.length > 5) {
+                alert('You can only upload up to 5 images.');
+                return;
+            }
+
+            let base64Images = [];
+
+            // Convert each selected image to Base64
+            for (let i = 0; i < files.length; i++) {
+                let file = files[i];
+                let reader = new FileReader();
+
+                let base64String = await new Promise((resolve, reject) => {
+                    reader.onload = function(e) {
+                        resolve(e.target.result);  // Get the Base64 part
+                    };
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);  // Read file as data URL
+                });
+
+                base64Images.push(base64String);
+            }
+
+            // Send the list of Base64 images to Flask via POST
+            fetch('/upload', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ imaginger: base64Images }),  // Send as JSON
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.redirect_url) {
+                    // Redirect the user to the URL received in the response
+                    window.location.href = data.redirect_url;
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        };
+    </script>
+{% endblock %}
